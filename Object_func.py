@@ -57,26 +57,32 @@ def get_colorpoints(pcd, reverse=False):
   return pcd
 
 # |=== Determines if pcd value is an object ===|
-def Is_object(pcd):
+def Is_object(pcd, radius):
   pcd, _ = Stat_removal(pcd, ratio=0.5)
   if np.size(np.asarray(pcd.points)) < 10: return False
   points = np.asarray(pcd.points)
   MM = Find_corner(points, 111111) # <-- Min Max dictionary
   x_diff, y_diff, z_diff = MM["x_max"][1]-MM["x_min"][1], MM["y_max"][0]-MM["y_min"][0], MM["z_max"][2]-MM["z_min"][2]
-  # Returns True or False based on given criterias
-  if y_diff == 0 or x_diff == 0 or z_diff == 0: return False;
+  #x_min, x_max = 3-10, 50
+  #y_min, y_max = 10, 50
+  #z_min, z_max = 3, 30
+
+  # Returns True or False based on given canditions
+  if y_diff == 0 or x_diff == 0 or z_diff == 0: return False
+
   if (abs(x_diff / y_diff) <= 2.85 and 
 	abs(x_diff / z_diff) <= 3.85 and 
 	abs(y_diff / z_diff) <= 3.85 and 
 		y_diff < 50 and 
-		y_diff > 5 and 
+		y_diff > 3 and 
 		x_diff < 50 and 
-		x_diff > 10 and 
+		x_diff > 3 and 
 		z_diff > 3 and 
 		z_diff < 30):
     return True
   else:
     return False
+
 
 # |=== Get bounding box from pcd ===|
 def get_BoBox(obj_pcd):

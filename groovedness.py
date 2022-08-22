@@ -89,10 +89,11 @@ def Analyse(MAX, MIN):
     Z = abs(MAX[i, 2] - MIN[i+1, 2])
     if Y < 1.5 and Z > 1:
       Highest_peak = Z if abs(Z) > Highest_peak else Highest_peak
-      DIFF.append(Z/Y)      
+      DIFF.append(Z/Y)
     peak_count = np.shape(MAX)[0]
   
   Groove = sum(DIFF) if np.size(DIFF) != 0 else 0
+  if 'peak_count' not in locals(): peak_count = 0
   return Groove, Highest_peak, peak_count
 
 def groove_main(pcd):

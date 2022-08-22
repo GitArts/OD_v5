@@ -2,7 +2,8 @@ import sys
 import os
 import pandas as pd
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QApplication, QLabel, QGridLayout, QWidget, QPushButton, QLineEdit, QFileDialog
+from PyQt5.QtWidgets import (QApplication, QLabel, QGridLayout, QWidget, QPushButton, 
+				QLineEdit, QFileDialog, QScrollArea, QHBoxLayout)
 from PyQt5.QtGui import QCursor
 import open3d as o3d
 import numpy as np
@@ -10,12 +11,20 @@ from main import main
 from helper import get_pcd, Stat_removal
 import groovedness
 
-
-
 app = QApplication(sys.argv)
 window = QWidget()
 window.setWindowTitle("3D Object detection")
-grid = QGridLayout()
+
+layout = QHBoxLayout()
+scroll = QScrollArea()
+scroll.setWidgetResizable(True)
+scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+#scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+scrollContent = QWidget()
+grid = QGridLayout(scrollContent)
+scroll.setWidget(scrollContent)
+layout.addWidget(scroll)
+
 #window.setStyleSheet("background-image: url(./B2.jpg)")    #background:#a8edb9;")
 window.setStyleSheet("background: '#03105c'")
 widgets = {"logo": [], "button": [], "text": [], "input": []}
@@ -27,7 +36,7 @@ Results = {"Objecta Nr": [],
             "Rievainīgima indekss": [],
             "Objekta zemākā rieva": [],
             "Objekta rievu skaits": []}
-            
+
 fname = ''
 pcd = ''
 OB = "Pagaidām nav analizēts nevies punktu mākonis. Objektu nav."
@@ -213,15 +222,29 @@ def frame1():
     grid.addWidget(widgets["button"][inx], inx+3, 0)
     inx += 1
 
+
 def frame2():
   clear_widgets()
-
   if isinstance(OB, str):
     NoOb = createLine(OB)
     widgets["text"].append(NoOb)
     grid.addWidget(NoOb, 1, 0, 1, 2) #(*widget, fromRow, fromColumn, rowSpan, colomnSpan)
     inx = 2
   else:
+    '''
+    layout = QHBoxLayout()
+    scroll = QScrollArea()
+    scroll.setWidgetResizable(True)
+    #scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+    #scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+    scrollContent = QWidget()
+    print (grid)
+    grid = QGridLayout(scrollContent)
+    print (grid)
+    scroll.setWidget(scrollContent)
+    layout.addWidget(scroll)
+    '''
+
     # |=== Captions of the table ===|
     Table_Nr = createLine("Objecta Nr")
     W, D, H = createLine("Objekta platums (W)"), createLine("Objekta dziļums (D)"), createLine("Objekta augstums (H)")
@@ -276,7 +299,7 @@ def frame2():
       grid.addWidget(groove_COUNT, inx, 6)
       grid.addWidget(Viz, inx, 7)
       inx += 1
-    
+
     info_groove = createLine("|== Info ==|\n\n|== Faila saglabāšana ==|\nPirms saglabāšanas lūdzu norādiet faila nosaukumu teksta lodziņā. \nIr iespējams mainīt mapes. Piemēram var norādīt <mapes nosaukums>/faila nosaukums. \nIzmantojiet '/' zīmi, starp mapes un faila nosaukumu. \n\n|== Rievainīgums ==|\nObjekts skaitās rievains, ja rievainīguma indeks ir virs 2,5.\nJo lielāks indekss, jo rievaināks ir objekts.\nObjekta rievainība atkarīga no rievu daudzuma un lieluma.")
     grid.addWidget(info_groove, inx, 3, inx+1, 7)
     # |======== last buttons =======|
@@ -295,14 +318,16 @@ def frame2():
     button_save.clicked.connect(lambda: save_txt(widgets["input"][-1].text()))
     grid.addWidget(button_save, inx, 0, inx, 2)
     grid.addWidget(path, inx, 2)
+
   button_last = create_BigButton("Atpakaļ")
   button_last.clicked.connect(frame1)
   grid.addWidget(button_last, inx+1, 0, inx+1, 2)
-  
+
+
 def test_fun(Text):
   print (Text)
 
-def save_txt(path):  
+def save_txt(path):
   if path == '': path="Rezultāts"
   print (path)
   if os.path.exists(path + ".xlsx"): os.remove(path + ".xlsx")
@@ -319,7 +344,8 @@ def save_txt(path):
   data.to_excel(path+".xlsx", index=False)
 
 
-window.setLayout(grid)
+print ("setup hello")
+window.setLayout(layout)
 frame1()
 window.show()
 sys.exit(app.exec())

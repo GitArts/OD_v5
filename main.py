@@ -6,7 +6,7 @@ from copy import deepcopy
 from OD_FUNC import *
 from groovedness import *
 from Object_func import *
-from helper import get_pcd, show_pcd, Find_corner, scale_pcd, Stat_removal, Align_base, OB_param
+from helper import get_pcd, show_pcd, Find_corner, scale_pcd, Stat_removal, OB_param
 '''
 This project contains 24 functions:
 -------------------------------
@@ -56,7 +56,6 @@ def main(pcd, radius):
   if radius > 40: radius=40
   
    # |=== Rotate pcd for analysis ===|
-  pcd, Base_z = Align_base(pcd) # <-- Return Base_z from y_max[2]
   pcd_rot = deepcopy(pcd)                 # <-- copy pcd
   
      # |=== Scale pcd for analysis ===|
@@ -93,7 +92,8 @@ def main(pcd, radius):
 
     if not Skip:
       # |=== If the obj_pcd (which is one possible object) is trully an object --> ===|
-      Is_an_object = Is_object(obj_pcd)
+      Is_an_object = Is_object(obj_pcd, radius)
+
       # |=== --> Then save the object and it's parameters ===|
       if Is_an_object:
         BB_nr += 1       # There are f{BB_nr} Bounding boxes. BB["BB0"] will be 'pcd'.
@@ -102,17 +102,17 @@ def main(pcd, radius):
         BB[f"BB{BB_nr}"] = get_BoBox(obj_pcd)
         # |=== From BB get and save colored object ===|
         OB[f"OB{BB_nr}"] = From_BB_get_pcd(BB[f"BB{BB_nr}"], pcd_rot_scd)
-        #  |== anti-scale bounding boxes and save anti-scaled BB==|
+        #  |== anti-scale bounding boxes and save anti-scaled BB ==|
         BB[f"BB{BB_nr}"], _ = scale_pcd(BB[f"BB{BB_nr}"], scale_num, pcd_center, ForwScale=False)
         # |=== anti-scale OB ===|
-        OB_anti_scd, _ = scale_pcd(obj_pcd, scale_num, pcd_center, ForwScale=False)                
+        OB_anti_scd, _ = scale_pcd(obj_pcd, scale_num, pcd_center, ForwScale=False)
         # |=== get and save OB height, width, depth (real size parameters) ===|
         OB_WDH[f"{BB_nr}"] = OB_param(OB_anti_scd, pcd_rot, BB[f"BB{BB_nr}"]) # (OB, pcd, BB) is input
         # |=== find and save objekt |=Groovedness index, max height, how many grovies=| ===|
         groove_ind[f"{BB_nr}"], Groove_max_height[f"{BB_nr}"], Groove_count[f"{BB_nr}"] = groove_main(OB_anti_scd)
       else:
         pass
-    pcd = del_object(pcd, obj_pcd) # after this line execution pcd contains the same points, 
+    pcd = del_object(pcd, obj_pcd) # after this line execution pcd contains the same points,
   # |=== BB print() ===|
   #print_BB_info(BB, Base_z)
   # Rotate pcd again ===========================
@@ -129,10 +129,10 @@ def main(pcd, radius):
 if __name__  ==  '__main__':
   # use ./file.pcd for current directory
   #pcd_name = "../data_cidonijas3d/a5.pcd"
-  pcd_name = "../data_avenes3d/par_1.pcd"
-  pcd = get_pcd(pcd_name, pcd=True)["pcd"]
+  # pcd_name = "../akfen_3d_imaging/data_avenes3d/par_1.pcd"
   # pcd_name = "../../data_cidonijas3d/a1.pcd"
   # problēma ar brūnu fonu ========
-  # pcd_name = "../../../samples_3D/avenes/sample_19.pcd"
+  pcd_name = "./../../samples/berries/PATRICIJA_3.pcd"
+  pcd = get_pcd(pcd_name, pcd=True)["pcd"]
   exit(main(pcd, 10))
 

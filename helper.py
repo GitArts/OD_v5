@@ -96,26 +96,6 @@ def scale_pcd(pcd, n, pcd_center, ForwScale=True):
   scaled_by = 1/n
   return Scaled_pcd, scaled_by
 
-# |== align base on z axis ==|
-def Align_base(pcd):
-  # Rotate around Y axis =======================================>
-  MM = Find_corner(np.asarray(pcd.points), '001100')
-  diff_z_x = MM["x_max"][2] - MM["x_min"][2]    # <-- get z valu>
-  diff_x = MM["x_max"][1] - MM["x_min"][1]      # <-- get x valu>
-
-  rot_y = np.arcsin(diff_z_x/diff_x) # <-- rad
-  R = pcd.get_rotation_matrix_from_xyz((rot_y, 0, 0))
-  pcd.rotate(R, center = MM["x_max"])
-
-  # Rotate around X axis =======================================>
-  MM = Find_corner(np.asarray(pcd.points), 110000)
-  diff_z_y = MM["y_max"][2] - MM["y_min"][2]
-  diff_y = MM["y_max"][0] - MM["y_min"][0]
-  rot_x = np.arcsin(diff_z_y/diff_y) # <-- rad
-  R = pcd.get_rotation_matrix_from_xyz((0, rot_x, 0))
-  pcd.rotate(R, center = MM["y_max"])
-  return pcd, MM["y_max"][2]
-
 def get_height(OB, pcd, BB):
   OB_points = np.asarray(OB.points)
   pcd_points = np.asarray(pcd.points)
