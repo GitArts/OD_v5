@@ -63,9 +63,9 @@ def Is_object(pcd, radius):
   points = np.asarray(pcd.points)
   MM = Find_corner(points, 111111) # <-- Min Max dictionary
   x_diff, y_diff, z_diff = MM["x_max"][1]-MM["x_min"][1], MM["y_max"][0]-MM["y_min"][0], MM["z_max"][2]-MM["z_min"][2]
-  #x_min, x_max = 3-10, 50
-  #y_min, y_max = 10, 50
-  #z_min, z_max = 3, 30
+
+  # min radius = 5; min Norm = 20; max Norm = 50; radiuss range = 35
+  Norm = 20+(((radius-5)*(50-20))/35)
 
   # Returns True or False based on given canditions
   if y_diff == 0 or x_diff == 0 or z_diff == 0: return False
@@ -73,9 +73,9 @@ def Is_object(pcd, radius):
   if (abs(x_diff / y_diff) <= 2.85 and 
 	abs(x_diff / z_diff) <= 3.85 and 
 	abs(y_diff / z_diff) <= 3.85 and 
-		y_diff < 50 and 
+		y_diff < Norm and 
 		y_diff > 3 and 
-		x_diff < 50 and 
+		x_diff < Norm and 
 		x_diff > 3 and 
 		z_diff > 3 and 
 		z_diff < 30):
